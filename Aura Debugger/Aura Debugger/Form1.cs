@@ -74,5 +74,33 @@ namespace Aura_Debugger
                 }));
             }
         }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            if (autoscroll)
+            {
+                textBox1.SelectionStart = textBox1.Text.Length;
+                textBox1.ScrollToCaret();
+            }
+            else
+            {
+                //Find a way to not move the bar at the top and block it
+            }
+        }
+
+        bool autoscroll = false;
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (!checkBox1.Checked)
+            {
+                autoscroll = false;
+            }
+            else
+            {
+                autoscroll = true;
+            }
+            
+        }
     }
 }
