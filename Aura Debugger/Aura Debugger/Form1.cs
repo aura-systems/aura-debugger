@@ -38,10 +38,7 @@ namespace Aura_Debugger
             backgroundWorker1.RunWorkerAsync();
         }
 
-        private void UpdateStatus(string status)
-        {
-            textBox1.Text += status + Environment.NewLine;
-        }
+        int packetnumber = 0;
 
         private void backgroundWorker1_DoWork(object sen, DoWorkEventArgs e)
         {
@@ -70,7 +67,9 @@ namespace Aura_Debugger
             {
                 Invoke((MethodInvoker)(() =>
                 {
-                    textBox1.Text += message + Environment.NewLine;
+                    textBox1.Text += (@message + Environment.NewLine);
+                    packetnumber++;
+                    label2.Text = "Received logs: " + packetnumber.ToString();
                 }));
             }
         }
@@ -101,6 +100,18 @@ namespace Aura_Debugger
                 autoscroll = true;
             }
             
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            textBox1.Text = "";
+            packetnumber = 0;
+            label2.Text = "Received logs: 0";
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText(textBox1.Text);
         }
     }
 }
