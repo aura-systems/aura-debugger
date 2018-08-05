@@ -33,7 +33,7 @@ namespace Aura_Debugger
                 IP = endPoint.Address.ToString();
             }
 
-            label1.Text = "Waiting at " + IP + ", 4224";
+            label1.Text = "Waiting at " + IP + ", " + port;
             label1.Visible = true;
 
             backgroundWorker1.RunWorkerAsync();
@@ -41,6 +41,7 @@ namespace Aura_Debugger
         }
 
         int packetnumber = 0;
+        int port = 4224;
 
         private void backgroundWorker1_DoWork(object sen, DoWorkEventArgs e)
         {
@@ -49,7 +50,7 @@ namespace Aura_Debugger
             try
             {
 
-                server = new TcpListener(IPAddress.Any, 4224);
+                server = new TcpListener(IPAddress.Any, port);
 
                 server.Start();
 
