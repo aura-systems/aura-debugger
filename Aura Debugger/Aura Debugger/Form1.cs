@@ -2,6 +2,7 @@
 * PROJECT:          Aura Operating System Development
 * CONTENT:          Aura's Debugger!
 * PROGRAMMERS:      Valentin Charbonnier <valentinbreiz@gmail.com>
+*                   https://msdn.microsoft.com/en-us/library/system.net.sockets.tcplistener
 */
 
 using System;
@@ -32,46 +33,69 @@ namespace Aura_Debugger
                 IP = endPoint.Address.ToString();
             }
 
-            label1.Text = "Waiting at " + IP + ", 4224";
+            label1.Text = "Waiting at " + IP + ", " + port;
             label1.Visible = true;
 
             backgroundWorker1.RunWorkerAsync();
+
         }
 
         int packetnumber = 0;
+        int port = 4224;
 
         private void backgroundWorker1_DoWork(object sen, DoWorkEventArgs e)
         {
 
-            IPEndPoint ipep = new IPEndPoint(IPAddress.Any, 4224);
-
-            UdpClient newsock = new UdpClient(ipep);
-
-            IPEndPoint sender = new IPEndPoint(IPAddress.Any, 0);
-
-            while (true)
+            TcpListener server = null;
+            try
             {
-                if (backgroundWorker1.CancellationPending == true)
+
+                server = new TcpListener(IPAddress.Any, port);
+
+                server.Start();
+
+                Byte[] bytes = new Byte[256];
+                
+                while (true)
                 {
-                    e.Cancel = true;
-                    newsock.Close();
-                    return;
+                    WriteTextBox("Waiting connection with Aura...");
+
+                    TcpClient client = server.AcceptTcpClient();
+                    WriteTextBox("Connected!");
+
+                    NetworkStream stream = client.GetStream();
+
+                    int i;
+
+                    while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+                    {
+                        WriteTextBox(Encoding.ASCII.GetString(bytes, 0, i));
+
+                    }
+
+                    client.Close();
+                    WriteTextBox("Connection closed!");
                 }
-
-                byte[] data = newsock.Receive(ref sender);
-
-                WriteTextBox(Encoding.ASCII.GetString(data));
             }
-
-            void WriteTextBox(String message)
+            catch (SocketException ee)
             {
-                Invoke((MethodInvoker)(() =>
-                {
-                    textBox1.Text += (@message + Environment.NewLine);
-                    packetnumber++;
-                    label2.Text = "Received logs: " + packetnumber.ToString();
-                }));
+                WriteTextBox("Socket Exception: " + ee);
             }
+            finally
+            {
+                server.Stop();
+                WriteTextBox("Connection closed!");
+            }
+        }
+
+        void WriteTextBox(String message)
+        {
+            Invoke((MethodInvoker)(() =>
+            {
+                textBox1.Text += (@message + Environment.NewLine);
+                packetnumber++;
+                label2.Text = "Received logs: " + packetnumber.ToString();
+            }));
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
@@ -113,5 +137,6 @@ namespace Aura_Debugger
         {
             Clipboard.SetText(textBox1.Text);
         }
+
     }
 }
