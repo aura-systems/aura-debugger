@@ -1,6 +1,6 @@
 # Aura Debugger
-A debugger for Aura OS using UDP!
+A debugger for Aura OS using TCP!
 
 [Download the executable here.](https://github.com/aura-systems/aura-debugger/releases/download/0.1/Aura.Debugger.exe)
 
-<p align="center"><img src="https://image.noelshack.com/fichiers/2018/29/6/1532202366-auradebugger.png"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/aura-systems/aura-debugger/master/Screenshot/aura-debugger.png"></p>
