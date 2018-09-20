@@ -69,8 +69,8 @@ namespace Aura_Debugger
 
                     while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
                     {
+                        packetnumber++;
                         WriteTextBox(Encoding.ASCII.GetString(bytes, 0, i));
-
                     }
 
                     client.Close();
@@ -93,7 +93,6 @@ namespace Aura_Debugger
             Invoke((MethodInvoker)(() =>
             {
                 textBox1.Text += (@message + Environment.NewLine);
-                packetnumber++;
                 label2.Text = "Received logs: " + packetnumber.ToString();
             }));
         }
