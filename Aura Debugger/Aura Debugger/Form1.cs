@@ -23,21 +23,9 @@ namespace Aura_Debugger
 
         private void Form1_Load(object sender, EventArgs e)
         {
-
-            string IP = "XX.XX.XX.XX";
-
-            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
-            {
-                socket.Connect("8.8.8.8", 65530);
-                IPEndPoint endPoint = socket.LocalEndPoint as IPEndPoint;
-                IP = endPoint.Address.ToString();
-            }
-
-            label1.Text = "Waiting at " + IP + ", " + port;
-            label1.Visible = true;
-
-            backgroundWorker1.RunWorkerAsync();
-
+            button1.Enabled = false;
+            button2.Enabled = false;
+            label1.Visible = false;
         }
 
         int packetnumber = 0;
@@ -45,11 +33,10 @@ namespace Aura_Debugger
 
         private void backgroundWorker1_DoWork(object sen, DoWorkEventArgs e)
         {
-
             TcpListener server = null;
+
             try
             {
-
                 server = new TcpListener(IPAddress.Any, port);
 
                 server.Start();
@@ -58,10 +45,12 @@ namespace Aura_Debugger
                 
                 while (true)
                 {
-                    WriteTextBox("Waiting connection with Aura...");
+                    WriteTextBox("Waiting for a connection...");
 
                     TcpClient client = server.AcceptTcpClient();
                     WriteTextBox("Connected!");
+
+                    DebuggerConnected();
 
                     NetworkStream stream = client.GetStream();
 
@@ -86,6 +75,62 @@ namespace Aura_Debugger
                 server.Stop();
                 WriteTextBox("Connection closed!");
             }
+        }
+
+        private void backgroundWorker2_DoWork(object sender, DoWorkEventArgs e)
+        {
+            try
+            {
+                string[] splitted = textBox2.Text.Split(':');
+                string ip = splitted[0];
+                string port = splitted[1];
+
+                Byte[] bytes = new Byte[256];
+
+                while (true)
+                {
+                    WriteTextBox("Waiting to connect...");
+
+                    TcpClient client = new TcpClient();
+
+                    client.Connect(ip, int.Parse(port));
+
+                    //label1.Text = "Connected to " + ip + ", " + port;
+                    //label1.Visible = true;
+
+                    WriteTextBox("Connected!");
+
+                    NetworkStream stream = client.GetStream();
+
+                    int i;
+
+                    while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+                    {
+                        packetnumber++;
+                        WriteTextBox(Encoding.ASCII.GetString(bytes, 0, i));
+                    }
+
+                    client.Close();
+                    WriteTextBox("Connection closed!");
+                }
+            }
+            catch (SocketException ee)
+            {
+                WriteTextBox("Socket Exception: " + ee);
+            }
+            finally
+            {
+                WriteTextBox("Connection closed!");
+            }
+        }
+
+        void DebuggerConnected()
+        {
+            Invoke((MethodInvoker)(() =>
+            {
+                button1.Enabled = true;
+                button2.Enabled = true;
+            }));
         }
 
         void WriteTextBox(String message)
@@ -137,5 +182,43 @@ namespace Aura_Debugger
             Clipboard.SetText(textBox1.Text);
         }
 
+        private void button4_Click(object sender, EventArgs e)
+        {
+            button4.Visible = false;
+            button3.Visible = false;
+            label3.Visible = false;
+            textBox2.Visible = false;
+
+            string IP = "XX.XX.XX.XX";
+
+            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
+            {
+                socket.Connect("8.8.8.8", 65530);
+                var endPoint = socket.LocalEndPoint as IPEndPoint;
+                IP = endPoint.Address.ToString();
+            }
+
+            label1.Text = "Waiting at " + IP + ", " + port;
+            label1.Visible = true;
+
+            backgroundWorker1.RunWorkerAsync();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (textBox2.Text == "")
+            {
+                MessageBox.Show("Please specify an IP Address and Port.");
+            }
+            else
+            {
+                button4.Visible = false;
+                button3.Visible = false;
+                label3.Visible = false;
+                textBox2.Visible = false;
+
+                backgroundWorker2.RunWorkerAsync();
+            }  
+        }
     }
 }
