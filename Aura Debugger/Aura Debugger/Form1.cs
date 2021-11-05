@@ -6,16 +6,20 @@
 */
 
 using System;
+using System.IO;
 using System.ComponentModel;
 using System.Text;
 using System.Windows.Forms;
 using System.Net;
 using System.Net.Sockets;
+using System.Drawing;
 
 namespace Aura_Debugger
 {
     public partial class Form1 : Form
     {
+        private bool autoscroll;
+
         public Form1()
         {
             InitializeComponent();
@@ -23,176 +27,155 @@ namespace Aura_Debugger
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            button1.Enabled = false;
-            button2.Enabled = false;
-            label1.Visible = false;
+            BtnClear.Enabled = false;
+            BtnCopy.Enabled = false;
+            LabelStatus.Visible = false;
 
             autoscroll = true;
+            ConfigManager.LoadConfig();
+
+            NetworkManager.WriteInfo("Ready to connect");
         }
 
-        int packetnumber = 0;
-        int port = 4224;
-
-        private void backgroundWorker1_DoWork(object sen, DoWorkEventArgs e)
+        // wait for connection
+        private void WorkerWait_DoWork(object sen, DoWorkEventArgs e)
         {
-            TcpListener server = null;
-
-            try
-            {
-                server = new TcpListener(IPAddress.Any, port);
-
-                server.Start();
-
-                Byte[] bytes = new Byte[256];
-                
-                while (true)
-                {
-                    WriteTextBox("Waiting for a connection...");
-
-                    TcpClient client = server.AcceptTcpClient();
-                    WriteTextBox("Connected!");
-
-                    DebuggerConnected();
-
-                    NetworkStream stream = client.GetStream();
-
-                    int i;
-
-                    while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
-                    {
-                        packetnumber++;
-                        WriteTextBox(Encoding.ASCII.GetString(bytes, 0, i));
-                    }
-
-                    client.Close();
-                    WriteTextBox("Connection closed!");
-                }
-            }
-            catch (SocketException ee)
-            {
-                WriteTextBox("Socket Exception: " + ee);
-            }
-            finally
-            {
-                server.Stop();
-                WriteTextBox("Connection closed!");
-            }
+            NetworkManager.WaitForConnection();
         }
 
-        private void backgroundWorker2_DoWork(object sender, DoWorkEventArgs e)
+        // connect
+        private void WorkerConnect_DoWork(object sender, DoWorkEventArgs e)
         {
-            try
-            {
-                string[] splitted = textBox2.Text.Split(':');
-                string ip = splitted[0];
-                string port = splitted[1];
-
-                Byte[] bytes = new Byte[256];
-
-                while (true)
-                {
-                    WriteTextBox("Waiting to connect...");
-
-                    TcpClient client = new TcpClient();
-
-                    client.Connect(ip, int.Parse(port));
-
-                    //label1.Text = "Connected to " + ip + ", " + port;
-                    //label1.Visible = true;
-
-                    WriteTextBox("Connected!");
-
-                    NetworkStream stream = client.GetStream();
-
-                    int i;
-
-                    while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
-                    {
-                        packetnumber++;
-                        WriteTextBox(Encoding.ASCII.GetString(bytes, 0, i));
-                    }
-
-                    client.Close();
-                    WriteTextBox("Connection closed!");
-                }
-            }
-            catch (SocketException ee)
-            {
-                WriteTextBox("Socket Exception: " + ee);
-            }
-            finally
-            {
-                WriteTextBox("Connection closed!");
-            }
+            NetworkManager.Connect(TxtIP.Text);
         }
 
-        void DebuggerConnected()
+        public void ResetState()
         {
             Invoke((MethodInvoker)(() =>
             {
-                button1.Enabled = true;
-                button2.Enabled = true;
+                if (TxtOutput.Text.Length == 0)
+                {
+                    BtnClear.Enabled = false;
+                    BtnCopy.Enabled = false;
+                }
+                TxtIP.Enabled = true;
+                BtnWait.Enabled = true;
+                BtnConnect.Enabled = true;
+
+                BtnConnect.Text = "Connect";
+                BtnConnect.ForeColor = Color.LawnGreen;
             }));
         }
 
-        void WriteTextBox(String message)
+        public void ConnectedState()
         {
             Invoke((MethodInvoker)(() =>
             {
-                textBox1.Text += (@message + Environment.NewLine);
-                label2.Text = "Received logs: " + packetnumber.ToString();
+                BtnClear.Enabled = true;
+                BtnCopy.Enabled = true;
+                TxtIP.Enabled = false;
+                BtnWait.Enabled = false;
+
+                BtnConnect.Text = "Disconnect";
+                BtnConnect.ForeColor = Color.Tomato;
             }));
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        public void WriteTextBox(string message)
+        {
+            WriteTextBox(message, Color.White);
+        }
+
+        public void WriteTextBox(string message, Color color)
+        {
+            Invoke((MethodInvoker)(() =>
+            {
+                TxtOutput.SelectionStart = TxtOutput.TextLength;
+                TxtOutput.SelectionLength = 0;
+
+                TxtOutput.SelectionColor = color;
+                TxtOutput.AppendText(message);
+                TxtOutput.SelectionColor = TxtOutput.ForeColor;
+            }));
+        }
+
+        public void ClearLog()
+        {
+            Invoke((MethodInvoker)(() =>
+            {
+                NetworkManager.PacketNumber = 0;
+                TxtOutput.Clear();
+                LabelReceived.Text = "Received Logs: 0";
+            }));
+        }
+        
+        public bool GetWordWrap()
+        {
+            return TxtOutput.WordWrap;
+        }
+
+        public bool GetAutoScroll()
+        {
+            return autoscroll;
+        }
+
+        public void SetWordWrap(bool wrap)
+        {
+            Invoke((MethodInvoker)(() =>
+            {
+                if (wrap)
+                {
+                    TxtOutput.WordWrap = true;
+                    TxtOutput.ScrollBars = RichTextBoxScrollBars.ForcedVertical;
+                    ChkWordWrap.Checked = true;
+                }
+                else
+                {
+                    TxtOutput.WordWrap = false;
+                    TxtOutput.ScrollBars = RichTextBoxScrollBars.ForcedBoth;
+                    ChkWordWrap.Checked = false;
+                }
+            }));
+        }
+
+        public void SetAutoScroll(bool autoscrl)
+        {
+            Invoke((MethodInvoker)(() =>
+            {
+                autoscroll = autoscrl;
+                ChkAutoScroll.Checked = autoscroll;
+            }));
+        }
+
+        private void TxtOutput_TextChanged(object sender, EventArgs e)
         {
             if (autoscroll)
             {
-                textBox1.SelectionStart = textBox1.Text.Length;
-                textBox1.ScrollToCaret();
-            }
-            else
-            {
-                //Find a way to not move the bar at the top and block it
+                TxtOutput.SelectionStart = TxtOutput.Text.Length;
+                TxtOutput.ScrollToCaret();
             }
         }
 
-        bool autoscroll = false;
-
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        private void ChkAutoScroll_CheckedChanged(object sender, EventArgs e)
         {
-            if (!checkBox1.Checked)
-            {
-                autoscroll = false;
-            }
-            else
-            {
-                autoscroll = true;
-            }
-            
+            SetAutoScroll(ChkAutoScroll.Checked);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void BtnClear_Click(object sender, EventArgs e)
         {
-            textBox1.Text = "";
-            packetnumber = 0;
-            label2.Text = "Received logs: 0";
+            ClearLog();
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void BtnCopy_Click(object sender, EventArgs e)
         {
-            Clipboard.SetText(textBox1.Text);
+            Clipboard.SetText(TxtOutput.Text);
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private void BtnWait_Click(object sender, EventArgs e)
         {
-            button4.Visible = false;
-            button3.Visible = false;
-            label3.Visible = false;
-            textBox2.Visible = false;
+            ConnectedState();
 
-            string IP = "XX.XX.XX.XX";
-
+            string IP = string.Empty;
             using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
             {
                 socket.Connect("8.8.8.8", 65530);
@@ -200,41 +183,33 @@ namespace Aura_Debugger
                 IP = endPoint.Address.ToString();
             }
 
-            label1.Text = "Waiting at " + IP + ", " + port;
-            label1.Visible = true;
+            LabelStatus.Text = "Waiting at " + IP + ", " + NetworkManager.Port;
+            LabelStatus.Visible = true;
 
-            backgroundWorker1.RunWorkerAsync();
+            WorkerWait.RunWorkerAsync();
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void BtnConnect_Click(object sender, EventArgs e)
         {
-            if (textBox2.Text == "")
+            if (TxtIP.Text.Length == 0)
             {
-                MessageBox.Show("Please specify an IP Address and Port.");
+                MessageBox.Show("Please specify an IP address and port");
             }
             else
             {
-                button4.Visible = false;
-                button3.Visible = false;
-                label3.Visible = false;
-                textBox2.Visible = false;
-
-                backgroundWorker2.RunWorkerAsync();
+                ConnectedState();
+                WorkerConnect.RunWorkerAsync();
             }  
         }
 
-        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        private void ChkWordWrap_CheckedChanged(object sender, EventArgs e)
         {
-            if (checkBox2.Checked)
-            {
-                textBox1.WordWrap = true;
-                textBox1.ScrollBars = ScrollBars.Vertical;
-            }
-            else
-            {
-                textBox1.WordWrap = false;
-                textBox1.ScrollBars = ScrollBars.Both;
-            }
+            SetWordWrap(ChkWordWrap.Checked);
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            ConfigManager.SaveConfig();
         }
     }
 }
