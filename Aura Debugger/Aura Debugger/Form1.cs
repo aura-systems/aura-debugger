@@ -33,8 +33,6 @@ namespace Aura_Debugger
 
             autoscroll = true;
             ConfigManager.LoadConfig();
-
-            NetworkManager.WriteInfo("Ready to connect");
         }
 
         // wait for connection
@@ -210,6 +208,17 @@ namespace Aura_Debugger
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             ConfigManager.SaveConfig();
+        }
+
+        private void BtnSave_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog diag = new SaveFileDialog();
+            diag.Filter = "Text Files (.txt)|*.txt|All Files|*.*";
+
+            if (diag.ShowDialog() == DialogResult.OK)
+            {
+                File.WriteAllLines(diag.FileName, TxtOutput.Lines);
+            }
         }
     }
 }

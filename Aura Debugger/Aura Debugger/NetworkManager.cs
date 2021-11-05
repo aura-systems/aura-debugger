@@ -102,12 +102,20 @@ namespace Aura_Debugger
             if (parts.Length >= 1) { ip = parts[0]; }
             if (parts.Length >= 2) { port = parts[1]; }
 
-            // set port
+            // parse port
             if (!int.TryParse(port, out Port)) 
             { 
                 WriteError("Invalid port " + port);
                 Program.MainForm.ResetState();
                 return; 
+            }
+
+            // validate port
+            if (Port >= 0xFFFF)
+            { 
+                WriteError("Invalid port " + Port.ToString());
+                Program.MainForm.ResetState();
+                return;
             }
 
             try

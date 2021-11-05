@@ -43,6 +43,7 @@
             this.LabelIP = new System.Windows.Forms.Label();
             this.ChkWordWrap = new System.Windows.Forms.CheckBox();
             this.TxtOutput = new System.Windows.Forms.RichTextBox();
+            this.BtnSave = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // LabelStatus
@@ -51,7 +52,7 @@
             this.LabelStatus.AutoSize = true;
             this.LabelStatus.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LabelStatus.ForeColor = System.Drawing.Color.White;
-            this.LabelStatus.Location = new System.Drawing.Point(12, 511);
+            this.LabelStatus.Location = new System.Drawing.Point(12, 522);
             this.LabelStatus.Name = "LabelStatus";
             this.LabelStatus.Size = new System.Drawing.Size(38, 13);
             this.LabelStatus.TabIndex = 1;
@@ -70,7 +71,7 @@
             this.ChkAutoScroll.CheckState = System.Windows.Forms.CheckState.Checked;
             this.ChkAutoScroll.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ChkAutoScroll.ForeColor = System.Drawing.Color.White;
-            this.ChkAutoScroll.Location = new System.Drawing.Point(634, 510);
+            this.ChkAutoScroll.Location = new System.Drawing.Point(687, 521);
             this.ChkAutoScroll.Name = "ChkAutoScroll";
             this.ChkAutoScroll.Size = new System.Drawing.Size(73, 17);
             this.ChkAutoScroll.TabIndex = 2;
@@ -114,10 +115,11 @@
             // 
             // LabelReceived
             // 
+            this.LabelReceived.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.LabelReceived.AutoSize = true;
             this.LabelReceived.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.LabelReceived.ForeColor = System.Drawing.Color.White;
-            this.LabelReceived.Location = new System.Drawing.Point(174, 19);
+            this.LabelReceived.Location = new System.Drawing.Point(343, 522);
             this.LabelReceived.Name = "LabelReceived";
             this.LabelReceived.Size = new System.Drawing.Size(86, 13);
             this.LabelReceived.TabIndex = 5;
@@ -133,7 +135,7 @@
             this.BtnConnect.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.BtnConnect.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnConnect.ForeColor = System.Drawing.Color.Lime;
-            this.BtnConnect.Location = new System.Drawing.Point(489, 14);
+            this.BtnConnect.Location = new System.Drawing.Point(542, 14);
             this.BtnConnect.Name = "BtnConnect";
             this.BtnConnect.Size = new System.Drawing.Size(78, 23);
             this.BtnConnect.TabIndex = 6;
@@ -151,7 +153,7 @@
             this.TxtIP.ForeColor = System.Drawing.Color.White;
             this.TxtIP.Location = new System.Drawing.Point(353, 14);
             this.TxtIP.Name = "TxtIP";
-            this.TxtIP.Size = new System.Drawing.Size(130, 23);
+            this.TxtIP.Size = new System.Drawing.Size(183, 23);
             this.TxtIP.TabIndex = 7;
             // 
             // BtnWait
@@ -164,7 +166,7 @@
             this.BtnWait.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.BtnWait.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.BtnWait.ForeColor = System.Drawing.Color.White;
-            this.BtnWait.Location = new System.Drawing.Point(590, 14);
+            this.BtnWait.Location = new System.Drawing.Point(643, 14);
             this.BtnWait.Name = "BtnWait";
             this.BtnWait.Size = new System.Drawing.Size(117, 23);
             this.BtnWait.TabIndex = 8;
@@ -178,7 +180,7 @@
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label3.ForeColor = System.Drawing.Color.White;
-            this.label3.Location = new System.Drawing.Point(571, 19);
+            this.label3.Location = new System.Drawing.Point(624, 19);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(17, 13);
             this.label3.TabIndex = 9;
@@ -207,7 +209,7 @@
             this.ChkWordWrap.CheckState = System.Windows.Forms.CheckState.Checked;
             this.ChkWordWrap.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ChkWordWrap.ForeColor = System.Drawing.Color.White;
-            this.ChkWordWrap.Location = new System.Drawing.Point(540, 510);
+            this.ChkWordWrap.Location = new System.Drawing.Point(593, 521);
             this.ChkWordWrap.Name = "ChkWordWrap";
             this.ChkWordWrap.Size = new System.Drawing.Size(81, 17);
             this.ChkWordWrap.TabIndex = 11;
@@ -226,16 +228,34 @@
             this.TxtOutput.ForeColor = System.Drawing.Color.White;
             this.TxtOutput.Location = new System.Drawing.Point(12, 50);
             this.TxtOutput.Name = "TxtOutput";
-            this.TxtOutput.Size = new System.Drawing.Size(695, 454);
+            this.TxtOutput.Size = new System.Drawing.Size(748, 465);
             this.TxtOutput.TabIndex = 12;
             this.TxtOutput.Text = "";
+            // 
+            // BtnSave
+            // 
+            this.BtnSave.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(36)))), ((int)(((byte)(36)))), ((int)(((byte)(36)))));
+            this.BtnSave.FlatAppearance.BorderColor = System.Drawing.Color.Gray;
+            this.BtnSave.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(80)))), ((int)(((byte)(233)))));
+            this.BtnSave.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(112)))), ((int)(((byte)(255)))));
+            this.BtnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.BtnSave.Font = new System.Drawing.Font("Tahoma", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BtnSave.ForeColor = System.Drawing.Color.White;
+            this.BtnSave.Location = new System.Drawing.Point(174, 14);
+            this.BtnSave.Name = "BtnSave";
+            this.BtnSave.Size = new System.Drawing.Size(75, 23);
+            this.BtnSave.TabIndex = 13;
+            this.BtnSave.Text = "Save...";
+            this.BtnSave.UseVisualStyleBackColor = false;
+            this.BtnSave.Click += new System.EventHandler(this.BtnSave_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(18)))), ((int)(((byte)(18)))), ((int)(((byte)(18)))));
-            this.ClientSize = new System.Drawing.Size(719, 534);
+            this.ClientSize = new System.Drawing.Size(772, 545);
+            this.Controls.Add(this.BtnSave);
             this.Controls.Add(this.TxtOutput);
             this.Controls.Add(this.ChkWordWrap);
             this.Controls.Add(this.LabelIP);
@@ -273,6 +293,7 @@
         private System.Windows.Forms.Label LabelIP;
         private System.Windows.Forms.CheckBox ChkWordWrap;
         private System.Windows.Forms.RichTextBox TxtOutput;
+        private System.Windows.Forms.Button BtnSave;
     }
 }
 
