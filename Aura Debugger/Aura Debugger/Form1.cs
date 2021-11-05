@@ -18,7 +18,7 @@ namespace Aura_Debugger
 {
     public partial class Form1 : Form
     {
-        private bool autoscroll;
+        private bool autoscroll = true;
 
         public Form1()
         {
@@ -27,11 +27,7 @@ namespace Aura_Debugger
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            BtnClear.Enabled = false;
-            BtnCopy.Enabled = false;
-            LabelStatus.Visible = false;
-
-            autoscroll = true;
+            ResetState();
             ConfigManager.LoadConfig();
         }
 
@@ -62,6 +58,19 @@ namespace Aura_Debugger
 
                 BtnConnect.Text = "Connect";
                 BtnConnect.ForeColor = Color.LawnGreen;
+
+                LabelStatus.Text = "Ready to connect";
+            }));
+        }
+
+        public void ConnectingState()
+        {
+            Invoke((MethodInvoker)(() =>
+            {
+                BtnConnect.Text = "Disconnect";
+                BtnConnect.ForeColor = Color.Tomato;
+                BtnWait.Enabled = false;
+                LabelStatus.Text = "Attempting connection to: " + NetworkManager.IP + ":" + NetworkManager.Port.ToString();
             }));
         }
 
@@ -73,9 +82,22 @@ namespace Aura_Debugger
                 BtnCopy.Enabled = true;
                 TxtIP.Enabled = false;
                 BtnWait.Enabled = false;
+                BtnConnect.Enabled = true;
+                BtnWait.Enabled = false;
 
                 BtnConnect.Text = "Disconnect";
                 BtnConnect.ForeColor = Color.Tomato;
+
+                LabelStatus.Text = "Connected to: " + NetworkManager.IP + ":" + NetworkManager.Port.ToString();
+            }));
+        }
+
+        public void WaitState()
+        {
+            ConnectedState();
+            Invoke((MethodInvoker)(() =>
+            {
+                LabelStatus.Text = "Waiting for: " + NetworkManager.IP + ":" + NetworkManager.Port.ToString();
             }));
         }
 
@@ -171,33 +193,31 @@ namespace Aura_Debugger
 
         private void BtnWait_Click(object sender, EventArgs e)
         {
-            ConnectedState();
-
             string IP = string.Empty;
             using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, 0))
             {
-                socket.Connect("8.8.8.8", 65530);
+                NetworkManager.IP = "8.8.8.8";
+                NetworkManager.Port = 65530;
+                socket.Connect(NetworkManager.IP, NetworkManager.Port);
                 var endPoint = socket.LocalEndPoint as IPEndPoint;
                 IP = endPoint.Address.ToString();
             }
-
-            LabelStatus.Text = "Waiting at " + IP + ", " + NetworkManager.Port;
-            LabelStatus.Visible = true;
 
             WorkerWait.RunWorkerAsync();
         }
 
         private void BtnConnect_Click(object sender, EventArgs e)
         {
-            if (TxtIP.Text.Length == 0)
+            if (NetworkManager.Waiting || NetworkManager.Connected)
             {
-                MessageBox.Show("Please specify an IP address and port");
+                if (NetworkManager.Client != null) { NetworkManager.Client.Close(); }
+                if (NetworkManager.Listener != null) { NetworkManager.Listener.Stop(); }
+                ResetState();
+                return;
             }
-            else
-            {
-                ConnectedState();
-                WorkerConnect.RunWorkerAsync();
-            }  
+
+            if (TxtIP.Text.Length == 0) { MessageBox.Show("Please specify an IP address and port"); }
+            else { WorkerConnect.RunWorkerAsync(); } 
         }
 
         private void ChkWordWrap_CheckedChanged(object sender, EventArgs e)

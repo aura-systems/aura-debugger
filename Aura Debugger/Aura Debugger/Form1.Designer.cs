@@ -57,7 +57,7 @@
             this.LabelStatus.Size = new System.Drawing.Size(38, 13);
             this.LabelStatus.TabIndex = 1;
             this.LabelStatus.Text = "Ready";
-            this.LabelStatus.Visible = false;
+            this.LabelStatus.Visible = true;
             // 
             // WorkerWait
             // 
@@ -231,6 +231,7 @@
             this.TxtOutput.Size = new System.Drawing.Size(748, 465);
             this.TxtOutput.TabIndex = 12;
             this.TxtOutput.Text = "";
+            this.TxtOutput.TextChanged += new System.EventHandler(this.TxtOutput_TextChanged);
             // 
             // BtnSave
             // 
