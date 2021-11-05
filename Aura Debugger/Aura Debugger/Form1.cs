@@ -26,6 +26,8 @@ namespace Aura_Debugger
             button1.Enabled = false;
             button2.Enabled = false;
             label1.Visible = false;
+
+            autoscroll = true;
         }
 
         int packetnumber = 0;
@@ -219,6 +221,20 @@ namespace Aura_Debugger
 
                 backgroundWorker2.RunWorkerAsync();
             }  
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox2.Checked)
+            {
+                textBox1.WordWrap = true;
+                textBox1.ScrollBars = ScrollBars.Vertical;
+            }
+            else
+            {
+                textBox1.WordWrap = false;
+                textBox1.ScrollBars = ScrollBars.Both;
+            }
         }
     }
 }
